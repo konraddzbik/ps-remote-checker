@@ -27,7 +27,7 @@ HEADLINE = {
 
 
 def _c(key: str, text: str) -> str:
-    if not sys.stdout.isatty() or os.environ.get("NO_COLOR"):
+    if os.environ.get("NO_COLOR") or not (sys.stdout.isatty() or os.environ.get("FORCE_COLOR")):
         return text
     return f"{COLORS[key]}{text}{COLORS['reset']}"
 

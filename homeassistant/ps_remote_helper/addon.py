@@ -283,7 +283,8 @@ def main() -> None:
     server = make_server()
     drop_privileges()
     log(f"PS Remote Helper {__version__} · pairing code set (see the panel) · relay {HELPER.relay_url}")
-    HELPER.start()
+    if not os.environ.get("PSRC_PANEL_ONLY"):  # PSRC_PANEL_ONLY: serve saved state only (docs screenshots)
+        HELPER.start()
     server.serve_forever()
 
 

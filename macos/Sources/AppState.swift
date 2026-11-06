@@ -60,6 +60,9 @@ final class AppState: ObservableObject {
     @Published var speedTest = true
 
     private let dir: URL = {
+        if let override = ProcessInfo.processInfo.environment["PSRC_STATE_DIR"] {
+            return URL(fileURLWithPath: override, isDirectory: true)
+        }
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         let url = base.appendingPathComponent("PS Remote Checker", isDirectory: true)
         try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
