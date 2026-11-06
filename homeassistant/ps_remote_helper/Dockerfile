@@ -1,8 +1,7 @@
-ARG BUILD_FROM
-FROM $BUILD_FROM
+# Official multi-arch image (amd64 / arm64 / arm/v7); Supervisor picks the platform via --platform.
+FROM python:3.12-alpine3.20
 
-RUN apk add --no-cache python3 \
-    && adduser -D -H -s /sbin/nologin psrc
+RUN adduser -D -H -s /sbin/nologin psrc
 
 WORKDIR /app
 COPY ps_remote_checker /app/ps_remote_checker
