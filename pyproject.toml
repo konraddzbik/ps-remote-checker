@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ps-remote-checker"
+version = "1.1.0"
+description = "Check whether PS5 Remote Play / PS Portal can connect from outside the home network"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+ps-remote-check = "ps_remote_checker.cli:main"
+
+[tool.setuptools]
+packages = ["ps_remote_checker"]

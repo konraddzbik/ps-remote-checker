@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PS Remote Helper</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --card: #ffffff; --text: #16181d; --muted: #646b78; --faint: #9aa1ad;
+    --line: rgba(20, 24, 32, .09); --chip: rgba(20, 24, 32, .05);
+    --ok: #1f9d55; --warn: #d97706; --fail: #dc2626; --accent: #0f8b8d; --accent2: #6d4aff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #111316; --card: #1b1e23; --text: #eceef2; --muted: #a2a9b6; --faint: #6c7380;
+      --line: rgba(255, 255, 255, .08); --chip: rgba(255, 255, 255, .06);
+      --ok: #34c272; --warn: #f0a33a; --fail: #f26565; --accent: #2bb9bb; --accent2: #9a83ff;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+  .logo { width: 48px; height: 48px; border-radius: 13px; display: grid; place-items: center; color: #fff;
+          background: linear-gradient(135deg, var(--accent), var(--accent2)); font-size: 24px; flex: none; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); margin: 2px 0 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 16px; }
+  .card h2 { font-size: 16px; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .grow { flex: 1; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px;
+          font-size: 12px; font-weight: 700; letter-spacing: .02em; background: var(--chip); color: var(--muted); }
+  .chip.ok { background: color-mix(in srgb, var(--ok) 15%, transparent); color: var(--ok); }
+  .chip.warn { background: color-mix(in srgb, var(--warn) 15%, transparent); color: var(--warn); }
+  .chip.fail { background: color-mix(in srgb, var(--fail) 15%, transparent); color: var(--fail); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .code { font: 700 clamp(22px, 5vw, 32px)/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .06em;
+          padding: 12px 16px; border-radius: 10px; background: var(--chip); user-select: all; }
+  button { font: inherit; font-weight: 600; border: 1px solid var(--line); background: var(--card); color: var(--text);
+           border-radius: 9px; padding: 8px 14px; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button:disabled { opacity: .5; cursor: default; }
+  .muted { color: var(--muted); } .faint { color: var(--faint); font-size: 13px; }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 12px 0; }
+  .tile { border: 1px solid var(--line); border-radius: 12px; padding: 12px; min-height: 86px; }
+  .tile .k { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted);
+             display: flex; justify-content: space-between; }
+  .tile .v { font-size: 20px; font-weight: 650; margin-top: 4px; overflow-wrap: anywhere; }
+  .tile .d { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .tile.ok { border-color: color-mix(in srgb, var(--ok) 40%, transparent); }
+  .tile.warn { border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+  .tile.fail { border-color: color-mix(in srgb, var(--fail) 45%, transparent); }
+  .finding { display: grid; grid-template-columns: 22px 1fr; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .finding:first-child { border-top: 0; }
+  .finding .fix { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .ic { font-weight: 800; text-align: center; }
+  .ic.ok { color: var(--ok); } .ic.warn { color: var(--warn); } .ic.fail { color: var(--fail); }
+  .table { width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 700; }
+  th, td { padding: 8px 6px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+  .empty { padding: 18px; text-align: center; color: var(--muted); border: 1px dashed var(--line); border-radius: 10px; }
+  ol { margin: 0; padding-left: 20px; } li { margin: 4px 0; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; background: var(--chip);
+         padding: 1px 6px; border-radius: 6px; overflow-wrap: anywhere; }
+  .log { font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace; color: var(--muted); max-height: 220px; overflow: auto; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="logo" aria-hidden="true">🎮</div>
+    <div class="grow">
+      <h1>PS Remote Helper</h1>
+      <p class="sub">Live connection test for PS5 Remote Play / PS Portal: this add-on waits for tests from away.</p>
+    </div>
+    <span id="status" class="chip"><span class="dot"></span><span>Loading…</span></span>
+  </header>
+
+  <section class="card">
+    <h2>Pairing code</h2>
+    <div class="row">
+      <div id="code" class="code">––––-––––-––––</div>
+      <button id="copy">Copy</button>
+      <button id="newcode">New code</button>
+      <span class="grow"></span>
+      <span id="relay" class="faint"></span>
+    </div>
+    <p id="codehint" class="faint" style="margin:10px 0 0"></p>
+  </section>
+
+  <section class="card">
+    <div class="row" style="margin-bottom:4px">
+      <h2 class="grow" style="margin:0">Home self-check <span id="homechip" class="chip">–</span></h2>
+      <span id="homeat" class="faint"></span>
+      <button id="selfcheck" class="primary">Run self-check now</button>
+    </div>
+    <div id="hometiles" class="tiles"></div>
+    <div id="homefindings"></div>
+  </section>
+
+  <section class="card">
+    <h2>Live tests from away</h2>
+    <div id="sessions"></div>
+  </section>
+
+  <div class="two">
+    <section class="card">
+      <h2>How to test from away</h2>
+      <ol>
+        <li>Connect a laptop to the Wi-Fi the PS Portal will use, or to your phone hotspot. <b>Turn Tailscale off on it</b>, or the test won't use the real internet path.</li>
+        <li>Mac app: open <b>2 · Away (PS Portal)</b>, enter the code, click Run.</li>
+        <li>Terminal: <code id="cmd">python3 -m ps_remote_checker remote --pair …</code></li>
+        <li>The result appears in the table above.</li>
+      </ol>
+    </section>
+    <section class="card">
+      <h2>Security</h2>
+      <ol>
+        <li>This panel is only served through Home Assistant Ingress (your HA login / Tailscale).</li>
+        <li>No ports are forwarded. The helper opens a UDP path only for a test, only with a matching code, and only for about 30 s.</li>
+        <li>The relay sees encrypted messages only. The code never leaves your devices.</li>
+        <li>Rotate the code with <b>New code</b> if you shared it.</li>
+      </ol>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Activity</h2>
+    <div id="log" class="log"></div>
+  </section>
+  <p class="faint" id="version"></p>
+</main>
+<script src="panel.js"></script>
+</body>
+</html>
