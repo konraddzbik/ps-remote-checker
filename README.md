@@ -63,12 +63,12 @@ PS5 and the Portal (STUN + hole punching). Over that connection it measures the 
 a paced **15 Mbps test stream from home**, like the PS5's video.
 
 ```bash
-# at home (keeps running; prints a pairing code like 8V4C-7FXW-DJMJ)
+# at home (keeps running; prints a pairing code like ABCD-EFGH-JKMN)
 python3 -m ps_remote_checker helper
-python3 -m ps_remote_checker helper --code 8V4C-7FXW-DJMJ     # reuse a fixed code
+python3 -m ps_remote_checker helper --code ABCD-EFGH-JKMN     # reuse a fixed code
 
 # away, on the Portal's network
-python3 -m ps_remote_checker remote --pair 8V4C-7FXW-DJMJ
+python3 -m ps_remote_checker remote --pair ABCD-EFGH-JKMN
 ```
 
 - The helper also runs the home check every hour and sends the result along, so `--home` isn't needed with `--pair`.
