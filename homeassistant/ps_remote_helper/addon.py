@@ -144,7 +144,7 @@ class Helper:
                 self.relay_error = None
         if name in ("session_end", "session_result"):
             self.save()
-        log(" ".join(f"{k}={v}" for k, v in evt.items() if k != "ts"))
+        log(" ".join(f"{k}={v}" for k, v in evt.items() if k not in ("ts", "code")))  # never log the code
 
     # ---------------------------------------------------------------- panel data
     def status(self) -> dict:
@@ -282,7 +282,7 @@ def main() -> None:
     HELPER.ensure_code()
     server = make_server()
     drop_privileges()
-    log(f"PS Remote Helper {__version__} · pairing code {HELPER.code} · relay {HELPER.relay_url}")
+    log(f"PS Remote Helper {__version__} · pairing code set (see the panel) · relay {HELPER.relay_url}")
     HELPER.start()
     server.serve_forever()
 
